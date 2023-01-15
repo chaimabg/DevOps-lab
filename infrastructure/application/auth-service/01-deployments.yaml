@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+  labels:
+    app: auth-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: auth-app
+  template:
+    metadata:
+      labels:
+        app: auth-app
+    spec:
+      containers:
+      - name: auth-app
+        image: chaima22/auth-app:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+        

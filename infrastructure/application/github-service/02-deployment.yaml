@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: github-deployment
+  labels:
+    app: github-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: github-app
+  template:
+    metadata:
+      labels:
+        app: github-app
+    spec:
+      containers:
+      - name: github-app
+        image: chaima22/github-app:latest
+        ports:
+        - containerPort: 8088
+        

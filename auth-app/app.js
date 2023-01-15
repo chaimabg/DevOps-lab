@@ -7,14 +7,13 @@ var logger = require('morgan');
 var githubRouter = require('./src/routes/github.routes');
 var authRouter = require('./src/routes/auth.routes');
 
-var mongoose = require("mongoose");
+
 var cors = require("cors");
 var dotenv = require("dotenv");
 var app = express();
 
 dotenv.config();
 
-const PORT = process.env.PORT || 5000 ;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -45,14 +44,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-mongoose
-    .connect(
-        process.env.MONGOOSE_CONNECTION, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        }
-    )
-    .then(() => app.listen(PORT, console.log(`Sever running on port ${PORT}`)))
-    .catch((error) => console.log(error.message));
 
 module.exports = app;
