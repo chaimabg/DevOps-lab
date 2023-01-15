@@ -1,0 +1,4 @@
+apiVersion: v2 
+name: github-app
+description: Helm chart to install the github app
+version: 0.1.0

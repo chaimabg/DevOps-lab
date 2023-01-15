@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: github-deployment
+  labels:
+    app: github-app
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: github-app
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "8088"
+        prometheus.io/path: "/metrics"
+        prometheus.io/scrape: "true"
+      labels:
+        app: github-app
+    spec:
+      containers:
+      - name: github-app
+        image: chaima22/github-app:{{ .Values.image.tag }}
+        ports:
+        - containerPort: 8088
+        
