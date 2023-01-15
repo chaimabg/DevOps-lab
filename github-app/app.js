@@ -23,7 +23,7 @@ app.use(cors());
 
 app.use('/', indexRouter);
 
-
+const PORT = process.env.PORT || 8088 ;
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
@@ -39,7 +39,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-app.listen(process.env.PORT,() => {
-  console.log(`Example app listening on port ${process.env.PORT}`)
+app.listen(PORT,() => {
+  console.log(`Example app listening on port ${PORT}`)
 })
 module.exports = app;

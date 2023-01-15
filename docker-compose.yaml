@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  auth-app:
+    build: ./auth-service
+    ports:
+      - "5000:5000"
+  github-app:
+    build: ./github-service
+    ports:
+      - "8088:8088"

@@ -14,7 +14,7 @@ var app = express();
 
 dotenv.config();
 
-const PORT = process.env.PORT ;
+const PORT = process.env.PORT || 5000 ;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
