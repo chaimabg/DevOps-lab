@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: github-deployment
+  name: github-helm-deployment
   labels:
     app: github-app
 spec:
-  replicas: {{ .Values.deployment.replicas }}
+  replicas: {{ .Values.githubApp.deployment.replicas }}
   selector:
     matchLabels:
       app: github-app
@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: github-app
-        image: chaima22/github-app:{{ .Values.image.tag }}
+        image: {{.Values.dockerhub.username}}/{{.Values.githubApp.image.name}}:{{ .Values.githubApp.image.tag }}
         ports:
-        - containerPort: 8088
+        - containerPort: {{.Values.githubApp.http.port}}
         

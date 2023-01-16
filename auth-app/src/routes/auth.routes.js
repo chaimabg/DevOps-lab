@@ -1,8 +1,35 @@
 var express = require('express');
 var router = express.Router();
-const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt"); 
+
+const User = require("../models/User");
+
+const logger=require("../config/logger")
+
+const client = require('prom-client');
+let register = new client.Registry();
+
+
+const signinLogger= logger.child({
+    route : '/signin'
+});
+
+const signupLogger= logger.child({
+    route : '/signup'
+});
+
+
+client.collectDefaultMetrics({ register })
+
+const requests_counter = new client.Counter({
+  name: 'http_requests_counter',
+  help: 'Number of http requests',
+  labelNames: ['route', 'statusCode'],
+});
+register.registerMetric(requests_counter);
+
+
 /* login */
 router.post('/signin',async (req,res,next)=>{
     try {
@@ -20,6 +47,11 @@ router.post('/signin',async (req,res,next)=>{
                                 },
                                 process.env.JWT_SECRET_KEY,
                                 (err, token) => {
+                                    requests_counter.inc({route : '/signin',statusCode:200});
+                                    signinLogger.info("User Authenticated", {
+                                        REQ_ID: req.rid,
+                                        Client_IP: req.socket.remoteAddress, 
+                                    });
                                     res.status(200).send({
                                         username: existingUser.username,
                                         email: existingUser.email,
@@ -28,27 +60,50 @@ router.post('/signin',async (req,res,next)=>{
                                 }
                             );
                         } else {
+                            requests_counter.inc({route : '/signin',statusCode:400});
+                            signinLogger.error("Password incorrect", {
+                                REQ_ID: req.rid,
+                                Client_IP: req.socket.remoteAddress, 
+                            });
                             res.status(400).send({message: 'Your password is incorrect'})
                         }
     
                 } else {
+                    requests_counter.inc({route : '/signin',statusCode:400});
+                    signinLogger.error("Email incorrect", {
+                        REQ_ID: req.rid,
+                        Client_IP: req.socket.remoteAddress, 
+                    });
                     res.status(400).send({message: 'Address email or password incorrect'})
                 }
     
     
             });
         }else {
+            requests_counter.inc({route : '/signin',statusCode:400});
+            signinLogger.warn("Parameters are not available for sign up", {
+                REQ_ID: req.rid,
+                Client_IP: req.socket.remoteAddress, 
+            });
             res.status(400).send('All parameters is required !')
         }
         } catch (error) {
+            requests_counter.inc({route : '/signin',statusCode:400});
             res.status(400).send({'error': error})
         }
     
 });
+/* GET users */
 router.get('/',async(req,res,next)=>{
     User.find().then(users=>{
-        res.send(users)
+        requests_counter.inc({route : '/',statusCode:200});
+        logger.info("All users returned", {
+            REQ_ID: req.rid,
+            Client_IP: req.socket.remoteAddress, 
+        });
+        res.status(200).send(users)
     ,error=>{
+        requests_counter.inc({route : '/',statusCode:400});
         res.status(400).send(error)
     }})
 })
@@ -57,33 +112,48 @@ router.post('/signup',async (req,res,next)=>{
     try{
      
         const {email,username, password}=req.body;
-        console.log(email);
         if(email && password&&username){
             const existedUser = await User.findOne({ email: email });
-            console.log(existedUser);
             if (! existedUser)
         {    
             const hashedPassword = await bcrypt.hash(password, 10);
-            console.log(hashedPassword);
             const newUser = new User({
                 username: username,
                 email: email,
                 password: hashedPassword,
             });
-            console.log(newUser);
             const result = await newUser.save();
-    
-            res.status(200).send(result);
+            requests_counter.inc({route : '/signup',statusCode:201});
+            signupLogger.info("User created", {
+                REQ_ID: req.rid,
+                Client_IP: req.socket.remoteAddress, 
+            });
+            res.status(201).send(result);
         }else{
+            requests_counter.inc({route : '/signup',statusCode:400});
+            signupLogger.error("Email Address already exists", {
+                REQ_ID: req.rid,
+                Client_IP: req.socket.remoteAddress, 
+            });
                 res.status(400).send({message: 'Address email already exists'})
             }
         }else {
+            requests_counter.inc({route : '/signup',statusCode:400});
+            signupLogger.warn("Parameters are not available for sign up", {
+                REQ_ID: req.rid,
+                Client_IP: req.socket.remoteAddress, 
+            });
             res.status(400).send('All parameters is required !')
         }
     }catch (error) {
+            requests_counter.inc({route : '/signup',statusCode:400});
             res.status(400).send({'error': error})
         }
    
 });
-
+/* GET metrics */
+router.get('/metrics',async (req,res)=>{
+  res.setHeader('Content-type',register.contentType);
+  res.end(await register.metrics());
+})
 module.exports=router;

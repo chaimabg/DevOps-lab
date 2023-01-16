@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-helm-deployment
+  labels:
+    app: auth-app
+spec:
+  replicas: {{ .Values.authApp.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: auth-app
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "5000"
+        prometheus.io/path: "/metrics"
+        prometheus.io/scrape: "true"
+      labels:
+        app: auth-app
+    spec:
+      containers:
+      - name: auth-app
+        image: {{.Values.dockerhub.username}}/{{ .Values.authApp.image.name }}:{{ .Values.authApp.image.tag }}
+        ports:
+          - containerPort: {{ .Values.authApp.http.port }}
+        env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT # Needed for traces to work.
+              value: "http://$(HOST_IP):4317"
+            - name: OTEL_SERVICE_NAME           # Service name to be used by the tracer
+              value: "auth-app"

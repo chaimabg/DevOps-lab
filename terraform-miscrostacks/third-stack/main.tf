@@ -11,37 +11,31 @@ data "terraform_remote_state" "aks" {
 
 
 
-resource "kubernetes_namespace" "devops" {
+resource "kubernetes_namespace" "argocd_namespace" {
   metadata {
     labels = {
       environment = var.environment
     }
-
-    generate_name = "project"
+    name = "argocd"
   }
 }
 
-resource "kubernetes_secret" "grafana" {
-  metadata {
-    name      = "grafana-admin-credentials"
-    namespace = kubernetes_namespace.devops.id
-  }
-  data = {
-    admin-user     = "admin"
-    admin-password = "admin"
-  }
+resource "helm_release" "argo" {
+  name       = "argo-cd"
+  repository = "https://argoproj.github.io/argo-helm"
+  chart      = "argo-cd"
+  namespace  = kubernetes_namespace.argocd_namespace.name
+}
+# resource "helm_release" "prometheus" {
+#   name       = "prometheus"
+#   repository = "https://prometheus-community.github.io/helm-charts"
+#   chart      = "prometheus-community"
+#   namespace  = var.namespace
 
-}
-resource "helm_release" "prometheus" {
-  name       = "prometheus"
-  repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "kube-prometheus-stack"
-  namespace  = kubernetes_namespace.devops.id
-
-}
-resource "helm_release" "ingress" {
-  name       = "ingress-nginx"
-  repository = "https://kubernetes.github.io/ingress-nginx"
-  chart      = "ingress-nginx"
-  namespace  = "default"
-}
+# }
+# resource "helm_release" "ingress" {
+#   name       = "ingress-nginx"
+#   repository = "https://kubernetes.github.io/ingress-nginx"
+#   chart      = "ingress-nginx"
+#   namespace  = var.namespace
+# }

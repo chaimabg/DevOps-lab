@@ -2,6 +2,10 @@ variable "resource_group_name" {
   type        = string
   default = "Devops" 
 }
+variable "namespace" {
+  type        = string
+  default = "default" 
+}
 variable "environment" {
   type        = string
   description = "Environment name"
