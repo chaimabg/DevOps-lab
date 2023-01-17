@@ -1,6 +1,5 @@
 # DevOps-Lab
 We created two services : an authentication service and a GitHub service, allows the user to get a GitHub user repositories and consult his profile,developed using nodejs, mongoDB and the [official GitHub API](https://docs.github.com/en/rest).
-![image](https://user-images.githubusercontent.com/62261901/212963380-b923bce2-fd95-46dc-b17a-c42d266d0b90.png)
 
 
 ## Observability:
