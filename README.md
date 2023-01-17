@@ -29,12 +29,10 @@ We created two services : an authentication service and a GitHub service, allows
 
 
 ## Automation
--Automated infrastructure provisioning
-
-    we used Terraform to create well isolated and maintainable infrastructure layers (Microstacks)
-    - First Stack: Networking :  we created a Virtual Network and a Subnet where our webapp will run .
-    - Second Stack: Kubernetes Cluster : we provisioned an AKS cluster whithin the subnet created earlier .
-    - Third Stack : Monitoring  : we created the monitoring setup for our webapp using Kubernetes provider as well as Helm provider. This Stack is responsible for creating  a Kubernetes namespace for our monitoring setup then using Helm, it will install the monitoring tools .
+**Automated infrastructure provisioning:**  we used Terraform to create well isolated and maintainable infrastructure layers (Microstacks)
+- First Stack: Networking :  we created a Virtual Network and a Subnet where our webapp will run .
+- Second Stack: Kubernetes Cluster : we provisioned an AKS cluster whithin the subnet created earlier .
+- Third Stack : Monitoring  : we created the monitoring setup for our webapp using Kubernetes provider as well as Helm provider. This Stack is responsible for creating  a Kubernetes namespace for our monitoring setup then using Helm, it will install the monitoring tools .
 # Deployment
 ### Automated Deployment 
 to automate the deployment ,we ensured that by creating a Helm Chart for it which will be used by Argo CD for deployment. Each time there's  a change in the chart in the repository, it will automatically synchronize the app .
