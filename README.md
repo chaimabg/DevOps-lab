@@ -46,3 +46,9 @@ We also used a service mesh to expose the deployment as it uses intelligent rout
 ![image](https://user-images.githubusercontent.com/62261901/212961896-6c05ffbf-2fba-4e79-bee5-94938f4566a0.png)
 
 
+### Architecture :
+
+![image](https://user-images.githubusercontent.com/62261901/212973116-b3fe44a4-d168-4f74-913d-9f181f3535bf.png)
+
+
+
