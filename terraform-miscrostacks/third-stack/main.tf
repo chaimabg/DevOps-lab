@@ -89,7 +89,7 @@ resource "helm_release" "ingress" {
   chart      = "ingress-nginx"
   namespace  = kubernetes_namespace.ingress_namespace.id
   set {
-      name= "controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-health-probe-request-path"
+      name= "controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"
       value= "/healthz"
     }       
 }

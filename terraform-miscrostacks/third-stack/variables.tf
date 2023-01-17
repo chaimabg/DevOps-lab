@@ -16,8 +16,7 @@ variable "environment" {
   }
 }
 variable "datadog_api_key" {
-  type        = string
-  default = "0e9bc6ceb719f8a91b53fb5182e9d0d4" 
+  type        = string 
 }
 variable "grafana_password" {
   type        = string
