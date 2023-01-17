@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: auth-auth
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: authapp.devops
+      http:
+        paths:
+          - backend:
+              service:
+                name: auth-app-service
+                port:
+                  number: 5000
+            path: /
+            pathType: Prefix

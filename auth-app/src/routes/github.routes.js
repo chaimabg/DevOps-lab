@@ -1,19 +1,48 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-const axios = require('axios');
+const axios = require("axios");
+
+const logger = require("../config/logger");
+
+const {client,register} = require('../config/prom-client');
+const consulted_users_counter = new client.Counter({
+  name: 'consulted_users',
+  help: 'Github users the most consulted',
+  labelNames: ['username'],
+});
+
+register.registerMetric(consulted_users_counter);
+
+const githubReposLogger= logger.child({
+  route : '/github-repos'
+});
+
+const githubUserLogger= logger.child({
+  route : '/github-user'
+});
 
 /* GET repositories listing for user. */
+
 router.get('/github-repos', function(req, res, next) {
   const username=req.query.username;
   if(username)
   {axios.get(`${process.env.GITHUB_APP_URL}/repos?username=${username}`)
   .then(response => {
+    githubReposLogger.info("All repos returned", {
+      REQ_ID: req.rid,
+      username: username,
+      Client_IP: req.socket.remoteAddress, 
+  });
     res.status(200).send({repos: response.data})
   })
   .catch(error => {
     res.status(500).send(error);
   });
 }else {
+  githubReposLogger.warn("Username undefined", {
+    REQ_ID: req.rid,
+    Client_IP: req.socket.remoteAddress, 
+});
   res.status(400).send({error : 'Username undefined'})
 }
 });
@@ -24,12 +53,22 @@ router.get('/github-user', function(req, res, next) {
   if(username)
   {axios.get(`${process.env.GITHUB_APP_URL}/user?username=${username}`)
   .then(response => {
+    githubUserLogger.info("User info returned", {
+      REQ_ID: req.rid,
+      username: username,
+      Client_IP: req.socket.remoteAddress, 
+  });
+    consulted_users_counter.inc({username:req.query.username});
     res.status(200).send(response.data)
   })
   .catch(error => {
     res.status(500).send(error);
   });
 }else {
+  githubUserLogger.warn("Username undefined", {
+    REQ_ID: req.rid,
+    Client_IP: req.socket.remoteAddress, 
+});
   res.status(400).send({error : 'Username undefined'})
 }
 });

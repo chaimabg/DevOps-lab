@@ -9,39 +9,87 @@ data "terraform_remote_state" "aks" {
   }
 }
 
-
-
-resource "kubernetes_namespace" "devops" {
+resource "kubernetes_namespace" "argocd_namespace" {
   metadata {
     labels = {
       environment = var.environment
     }
-
-    generate_name = "project"
+    name = "argocd"
   }
 }
 
-resource "kubernetes_secret" "grafana" {
+resource "helm_release" "graphana" {
+  name       = "graphana"
+  repository = "https://grafana.github.io/helm-charts"
+  chart      = "grafana"
+  namespace = var.namespace
+}
+resource "kubernetes_namespace" "ingress_namespace" {
   metadata {
-    name      = "grafana-admin-credentials"
-    namespace = kubernetes_namespace.devops.id
+    labels = {
+      environment = var.environment
+    }
+    name = "ingress-basic"
   }
-  data = {
-    admin-user     = "admin"
-    admin-password = "admin"
-  }
-
 }
-resource "helm_release" "prometheus" {
+
+resource "helm_release" "argocd" {
+  name       = "argo-cd"
+  repository = "https://argoproj.github.io/argo-helm"
+  chart      = "argo-cd"
+  namespace  = kubernetes_namespace.argocd_namespace.id
+}
+
+resource "helm_release" Prometheus {
   name       = "prometheus"
   repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "kube-prometheus-stack"
-  namespace  = kubernetes_namespace.devops.id
-
+  chart      = "prometheus"
+  namespace = var.namespace
+  version    = "19.3.1"
+  values = [
+    file("${path.module}/helm-values/prometheus-values.yaml")
+  ]
+  
 }
+
+resource "helm_release" "datadog" {
+  name       = "datadog"
+  repository = "https://helm.datadoghq.com"
+  chart      = "datadog"
+  namespace  = var.namespace
+  set_sensitive {
+    name  = "datadog.apiKey"
+    value = var.datadog_api_key
+  }
+  set {
+    name  = "datadog.site"
+    value = "datadoghq.com"
+  }
+  set {
+    name  = "datadog.kubelet.enabled"
+    value = true
+  }
+   set {
+    name  = "datadog.logs.enabled"
+    value = true
+  }
+   set {
+    name  = "datadog.logs.containerCollectAll"
+    value = true
+  }
+  set {
+    name  = "datadog.otlp.receiver.protocols.grpc.enabled"
+    value = true
+  }
+}
+
 resource "helm_release" "ingress" {
   name       = "ingress-nginx"
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
-  namespace  = "default"
+  namespace  = kubernetes_namespace.ingress_namespace.id
+  set {
+      name= "controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"
+      value= "/healthz"
+    }       
 }

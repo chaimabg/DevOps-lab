@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: project
+  namespace: default
+spec:
+  gateways:
+    - projet-gateway
+  hosts:
+    - "*"
+  http:
+    - route:
+        - destination:
+            host: auth-app-service
+            subset: v1
+          weight: 70
+        - destination:
+            host: auth-app-service
+            subset: v2
+          weight: 30

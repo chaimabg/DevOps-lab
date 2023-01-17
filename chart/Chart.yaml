@@ -1,0 +1,4 @@
+apiVersion: v2 
+name: DevOps-project
+description: Helm chart to install the github and auth apps
+version: 0.1.0

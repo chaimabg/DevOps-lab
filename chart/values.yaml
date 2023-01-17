@@ -1,0 +1,21 @@
+dockerhub:
+  username: chaima22
+
+githubApp:
+  image:
+    name: github-app
+    tag: latest
+  http:
+    port: 8088
+  deployment:
+    replicas: 3
+
+authApp:
+  image:
+    name: auth-app
+    tag: latest
+  http:
+    port: 5000
+  deployment:
+    replicas: 3
+
