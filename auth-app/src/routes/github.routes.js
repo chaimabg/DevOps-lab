@@ -4,9 +4,14 @@ const axios = require('axios');
 
 const logger = require("../config/logger");
 
-const client = require('prom-client');
+const {client,register} = require('../config/prom-client');
+const consulted_users_counter = new client.Counter({
+  name: 'consulted_users',
+  help: 'Github users the most consulted',
+  labelNames: ['username'],
+});
 
-
+register.registerMetric(consulted_users_counter);
 
 const githubReposLogger= logger.child({
   route : '/github-repos'
@@ -52,6 +57,7 @@ router.get('/github-user', function(req, res, next) {
       username: username,
       Client_IP: req.socket.remoteAddress, 
   });
+    consulted_users_counter.inc({username:req.query.username});
     res.status(200).send(response.data)
   })
   .catch(error => {

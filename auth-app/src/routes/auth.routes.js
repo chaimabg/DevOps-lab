@@ -7,9 +7,9 @@ const User = require("../models/User");
 
 const logger=require("../config/logger")
 
-const client = require('prom-client');
-let register = new client.Registry();
+const {client,register} = require('../config/prom-client');
 
+  
 
 const signinLogger= logger.child({
     route : '/signin'
@@ -19,8 +19,6 @@ const signupLogger= logger.child({
     route : '/signup'
 });
 
-
-client.collectDefaultMetrics({ register })
 
 const requests_counter = new client.Counter({
   name: 'http_requests_counter',
@@ -153,6 +151,10 @@ router.post('/signup',async (req,res,next)=>{
 });
 /* GET metrics */
 router.get('/metrics',async (req,res)=>{
+    logger.info("metrics", {
+        REQ_ID: req.rid,
+        Client_IP: req.socket.remoteAddress,
+    });
   res.setHeader('Content-type',register.contentType);
   res.end(await register.metrics());
 })

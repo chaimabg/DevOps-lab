@@ -2,20 +2,6 @@ var express = require('express');
 var router = express.Router();
 const request = require('request');
 const {getRepositories,getUser}=require('../services/github.service');
-const client = require('prom-client');
-
-let register = new client.Registry();
-
-
-client.collectDefaultMetrics({ register })
-
-const consulted_users_counter = new client.Counter({
-  name: 'consulted_users',
-  help: 'Github users the most consulted',
-  labelNames: ['username'],
-});
-
-register.registerMetric(consulted_users_counter);
 
 
 /* GET Repositories of a user by username. */
@@ -50,10 +36,6 @@ router.get('/user', async function(req, res, next) {
     res.status(400).send({error : 'Username undefined'});
   }
 });
-/* GET metrics. */
-router.get('/metrics',async (req,res)=>{
-  res.setHeader('Content-type',register.contentType);
-  res.end(await register.metrics());
-})
+
 
 module.exports = router;
