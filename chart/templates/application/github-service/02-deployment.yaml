@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: github-helm-deployment
+  name: github-app
   labels:
     app: github-app
 spec:
@@ -19,8 +19,8 @@ spec:
         app: github-app
     spec:
       containers:
-      - name: github-app
-        image: {{.Values.dockerhub.username}}/{{.Values.githubApp.image.name}}:{{ .Values.githubApp.image.tag }}
-        ports:
-        - containerPort: {{.Values.githubApp.http.port}}
-        
+        - name: github-app
+          image: {{.Values.dockerhub.username}}/{{.Values.githubApp.image.name}}:{{ .Values.githubApp.image.tag }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{.Values.githubApp.http.port}}

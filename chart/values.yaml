@@ -8,7 +8,7 @@ githubApp:
   http:
     port: 8088
   deployment:
-    replicas: 1
+    replicas: 3
 
 authApp:
   image:
@@ -17,5 +17,5 @@ authApp:
   http:
     port: 5000
   deployment:
-    replicas: 1
+    replicas: 3
 

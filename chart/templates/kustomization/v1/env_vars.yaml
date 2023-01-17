@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: github-app
+    version: v1
+  name: github-app
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+        - name: github-app
+          env:
+            - name: GITHUB_APP_HOST
+              value: "github-app-service-v1"

@@ -29,21 +29,20 @@ register.registerMetric(requests_counter);
 
 
 /* login */
-router.post('/signin',async (req,res,next)=>{
+router.post('/signin', async(req, res, next) => {
     try {
-    const {email, password}=req.body;
-    if(email && password){
+        const { email, password } = req.body;
+        if (email && password) {
 
-             User.findOne({ email: email }).then(async (existingUser) => {
+            User.findOne({ email: email }).then(async(existingUser) => {
                 if (existingUser) {
-                        const isAuthenticated = await bcrypt.compare(password, existingUser.password);
-                        if (isAuthenticated) {
-                            jwt.sign(
-                                {
-                                    userId: existingUser._id,
-                                    email: existingUser.email,
-                                },
-                                process.env.JWT_SECRET_KEY,
+                    const isAuthenticated = await bcrypt.compare(password, existingUser.password);
+                    if (isAuthenticated) {
+                        jwt.sign({
+                                userId: existingUser._id,
+                                email: existingUser.email,
+                            },
+                            process.env.JWT_SECRET_KEY,
                                 (err, token) => {
                                     requests_counter.inc({route : '/signin',statusCode:200});
                                     signinLogger.info("User Authenticated", {
@@ -73,9 +72,10 @@ router.post('/signin',async (req,res,next)=>{
                         Client_IP: req.socket.remoteAddress, 
                     });
                     res.status(400).send({message: 'Address email or password incorrect'})
+
                 }
-    
-    
+
+
             });
         }else {
             requests_counter.inc({route : '/signin',statusCode:400});

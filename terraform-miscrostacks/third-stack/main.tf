@@ -24,14 +24,14 @@ resource "helm_release" "graphana" {
   chart      = "grafana"
   namespace = var.namespace
 }
-# resource "kubernetes_namespace" "ingress_namespace" {
-#   metadata {
-#     labels = {
-#       environment = var.environment
-#     }
-#     name = "ingress-basic"
-#   }
-# }
+resource "kubernetes_namespace" "ingress_namespace" {
+  metadata {
+    labels = {
+      environment = var.environment
+    }
+    name = "ingress-basic"
+  }
+}
 
 resource "helm_release" "argocd" {
   name       = "argo-cd"
@@ -52,44 +52,44 @@ resource "helm_release" Prometheus {
   
 }
 
-# resource "helm_release" "datadog" {
-#   name       = "datadog"
-#   repository = "https://helm.datadoghq.com"
-#   chart      = "datadog"
-#   namespace  = var.namespace
-#   set_sensitive {
-#     name  = "datadog.apiKey"
-#     value = var.datadog_api_key
-#   }
-#   set {
-#     name  = "datadog.site"
-#     value = "datadoghq.com"
-#   }
-#   set {
-#     name  = "datadog.kubelet.enabled"
-#     value = true
-#   }
-#    set {
-#     name  = "datadog.logs.enabled"
-#     value = true
-#   }
-#    set {
-#     name  = "datadog.logs.containerCollectAll"
-#     value = true
-#   }
-#   set {
-#     name  = "datadog.otlp.receiver.protocols.grpc.enabled"
-#     value = true
-#   }
-# }
+resource "helm_release" "datadog" {
+  name       = "datadog"
+  repository = "https://helm.datadoghq.com"
+  chart      = "datadog"
+  namespace  = var.namespace
+  set_sensitive {
+    name  = "datadog.apiKey"
+    value = var.datadog_api_key
+  }
+  set {
+    name  = "datadog.site"
+    value = "datadoghq.com"
+  }
+  set {
+    name  = "datadog.kubelet.enabled"
+    value = true
+  }
+   set {
+    name  = "datadog.logs.enabled"
+    value = true
+  }
+   set {
+    name  = "datadog.logs.containerCollectAll"
+    value = true
+  }
+  set {
+    name  = "datadog.otlp.receiver.protocols.grpc.enabled"
+    value = true
+  }
+}
 
-# resource "helm_release" "ingress" {
-#   name       = "ingress-nginx"
-#   repository = "https://kubernetes.github.io/ingress-nginx"
-#   chart      = "ingress-nginx"
-#   namespace  = kubernetes_namespace.ingress_namespace.id
-#   set {
-    #   name= "controller.service.annotations.service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"
-    #   value= "/healthz"
-    # }       
-# }
+resource "helm_release" "ingress" {
+  name       = "ingress-nginx"
+  repository = "https://kubernetes.github.io/ingress-nginx"
+  chart      = "ingress-nginx"
+  namespace  = kubernetes_namespace.ingress_namespace.id
+  set {
+      name= "controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-health-probe-request-path"
+      value= "/healthz"
+    }       
+}

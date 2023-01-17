@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-helm-deployment
+  name: auth-app
   labels:
     app: auth-app
 spec:
@@ -19,11 +19,16 @@ spec:
         app: auth-app
     spec:
       containers:
-      - name: auth-app
-        image: {{.Values.dockerhub.username}}/{{ .Values.authApp.image.name }}:{{ .Values.authApp.image.tag }}
-        ports:
-          - containerPort: {{ .Values.authApp.http.port }}
-        env:
+        - name: auth-app
+          image: {{.Values.dockerhub.username}}/{{ .Values.authApp.image.name }}:{{ .Values.authApp.image.tag }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.authApp.http.port }}
+          env:
+            - name: Github_APP_HOST
+              value: "github-app-service"
+            - name: GITHUB_APP_PORT
+              value: {{ .Values.authApp.http.port }}
             - name: HOST_IP
               valueFrom:
                 fieldRef:

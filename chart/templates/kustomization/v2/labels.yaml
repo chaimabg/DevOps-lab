@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: auth-app
+    version: v2
+  name: auth-app
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: auth-app
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: auth-app
+        version: v2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: github-app
+    version: v2
+  name: github-app
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: github-app
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: github-app
+        version: v2
